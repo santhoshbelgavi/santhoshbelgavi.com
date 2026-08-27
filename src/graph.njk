@@ -1,0 +1,98 @@
+---
+permalink: /graph/index.html
+excludeFromSitemap: true
+eleventyExcludeFromCollections: true
+---
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Knowledge Graph — Santhosh Belgavi</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="An interactive map of the work, systems and skills behind santhoshbelgavi.com.">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preload" href="/fonts/bricolage-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/hanken-latin.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+  @font-face{font-family:"Bricolage Grotesque";src:url("/fonts/bricolage-latin.woff2") format("woff2");font-weight:500 700;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+  @font-face{font-family:"Bricolage Grotesque";src:url("/fonts/bricolage-latin-ext.woff2") format("woff2");font-weight:500 700;font-display:swap;unicode-range:U+0100-02BA,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+2C60-2C7F,U+A720-A7FF}
+  @font-face{font-family:"Hanken Grotesk";src:url("/fonts/hanken-latin.woff2") format("woff2");font-weight:400 600;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+  @font-face{font-family:"Hanken Grotesk";src:url("/fonts/hanken-latin-ext.woff2") format("woff2");font-weight:400 600;font-display:swap;unicode-range:U+0100-02BA,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+2C60-2C7F,U+A720-A7FF}
+  :root{
+    --bg:#0F1115; --panel:#1A1D25; --ink:#E8E4DB; --ink-mid:#C4BEB2; --ink-dim:#948E82;
+    --line:rgba(232,228,219,.12); --line-strong:rgba(232,228,219,.26); --accent:#D8A868;
+    --edge:rgba(232,228,219,.13); --edge-hi:rgba(216,168,104,.9);
+    --shadow:0 12px 32px -12px rgba(0,0,0,.55);
+    --f-d:"Bricolage Grotesque","Segoe UI",-apple-system,sans-serif;
+    --f-b:"Hanken Grotesk",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink-mid);font-family:var(--f-b);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow:hidden}
+  #app{position:fixed;inset:0;display:flex;flex-direction:column}
+  header{padding:13px 20px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;background:var(--panel)}
+  header a.back{font-family:var(--f-b);font-size:13px;color:var(--ink-dim);text-decoration:none}
+  header a.back:hover{color:var(--accent)}
+  header h1{font-family:var(--f-d);font-weight:600;font-size:16px;letter-spacing:-.02em;color:var(--ink)}
+  header .sub{font-size:12px;color:var(--ink-dim)}
+  header .spacer{flex:1}
+  #search{font-family:var(--f-b);font-size:13px;padding:7px 11px;border-radius:7px;border:1px solid var(--line-strong);background:var(--bg);color:var(--ink);width:200px;max-width:40vw}
+  #search:focus{outline:2px solid var(--accent);outline-offset:1px}
+  #stage{position:relative;flex:1;overflow:hidden}
+  canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+  #legend{position:absolute;top:12px;left:12px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px;box-shadow:var(--shadow);max-width:210px;font-size:12px}
+  #legend .lg-h{font-family:var(--f-d);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-dim);margin-bottom:8px}
+  .lg-row{display:flex;align-items:center;gap:8px;padding:3px 4px;border-radius:5px;cursor:pointer;user-select:none}
+  .lg-row:hover{background:var(--bg)}
+  .lg-row.off{opacity:.32}
+  .lg-dot{width:10px;height:10px;border-radius:50%;flex:none}
+  .lg-row .lg-n{color:var(--ink);flex:1}
+  .lg-row .lg-c{color:var(--ink-dim);font-variant-numeric:tabular-nums}
+  #panel{position:absolute;top:12px;right:12px;width:320px;max-width:calc(100vw - 24px);background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:16px 18px;display:none;max-height:calc(100% - 24px);overflow-y:auto}
+  #panel.show{display:block}
+  #panel .p-type{font-family:var(--f-b);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.09em;margin-bottom:6px}
+  #panel h2{font-family:var(--f-d);font-weight:700;font-size:18px;line-height:1.2;color:var(--ink);margin-bottom:10px;letter-spacing:-.01em}
+  #panel .p-meta{font-size:12.5px;color:var(--ink-dim);margin-bottom:10px}
+  #panel .p-note{font-size:13.5px;color:var(--ink-mid);margin-bottom:14px}
+  #panel a.p-link{font-size:12.5px;color:var(--accent);word-break:break-all}
+  #panel .p-src{display:flex;gap:5px;flex-wrap:wrap;margin:12px 0}
+  #panel .p-src span{font-size:10.5px;padding:2px 7px;border-radius:99px;border:1px solid var(--line-strong);color:var(--ink-dim)}
+  #panel .p-conn-h{font-family:var(--f-b);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-dim);margin:14px 0 6px}
+  #panel .p-conn{font-size:12.5px;padding:4px 0;border-top:1px solid var(--line);cursor:pointer;color:var(--ink-mid)}
+  #panel .p-conn:hover{color:var(--accent)}
+  #panel .p-conn .r{color:var(--ink-dim)}
+  #panel .p-close{position:absolute;top:10px;right:12px;background:none;border:none;color:var(--ink-dim);font-size:20px;cursor:pointer;line-height:1}
+  #hint{position:absolute;bottom:12px;left:12px;font-size:11.5px;color:var(--ink-dim);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 10px}
+  @media (max-width:620px){
+    #legend{max-width:150px;font-size:11px}
+    #panel{width:calc(100vw - 24px);top:auto;bottom:12px;max-height:52%}
+    #hint{display:none}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <a class="back" href="/">&larr; santhoshbelgavi.com</a>
+    <h1>Knowledge Graph</h1>
+    <span class="sub">82 entities &middot; 136 links &middot; sites, r&eacute;sum&eacute; &amp; build notes</span>
+    <span class="spacer"></span>
+    <input id="search" type="search" placeholder="Search entities&hellip;" aria-label="Search entities">
+  </header>
+  <div id="stage">
+    <canvas id="c"></canvas>
+    <div id="legend"><div class="lg-h">Filter by type</div></div>
+    <div id="panel">
+      <button class="p-close" aria-label="Close">&times;</button>
+      <div class="p-type"></div><h2></h2>
+      <div class="p-meta"></div><div class="p-note"></div>
+      <a class="p-link" target="_blank" rel="noopener"></a>
+      <div class="p-src"></div>
+      <div class="p-conn-list"></div>
+    </div>
+    <div id="hint">Drag nodes &middot; click to focus &middot; scroll to zoom &middot; double-click to refit</div>
+  </div>
+</div>
+<script src="/graph/app.js"></script>
+</body>
+</html>

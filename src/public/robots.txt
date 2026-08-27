@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /graph/
 
 Sitemap: https://santhoshbelgavi.com/sitemap.xml
